@@ -1,0 +1,38 @@
+html, body {
+    height: 100%;
+}
+
+
+.container > h1 {
+    padding: 0 15px;
+}
+
+.loja {
+    margin-top: 32px;
+}
+
+.login {
+    display: table;
+    max-width: 400px;
+    height: calc(100% - 69px);
+}
+
+.login > .row {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.login .panel-heading {
+    font-size: 14pt;
+}
+
+.book img {
+    object-fit: cover;
+    width: 144px;
+    height: 186px;
+}
+
+.book .panel-heading {
+    font-size: 14pt;
+    text-align: right;
+}
