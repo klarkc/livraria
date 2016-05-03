@@ -1,5 +1,6 @@
 <%@ page import="livraria.*" %>
 <%@ page import="java.util.List" %>
+
 <!doctype html>
 
 <html lang="pt">
@@ -10,6 +11,7 @@
     List<Livro> livros = Livro.findAll();
 %>
 <body>
+    <%= Livraria.getNavBar(request) %>
     <div class="container header">
         <h1>Livraria Online</h1>
     </div>
