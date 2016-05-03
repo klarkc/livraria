@@ -22,19 +22,19 @@
                         <div class="form-group">
                             <label for="nome" class="col-sm-2 control-label">Nome</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="nome" placeholder="Nome">
+                                <input type="text" class="form-control" name="nome" placeholder="Nome">
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="senha" class="col-sm-2 control-label">Senha</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="senha" placeholder="Senha">
+                                <input type="text" class="form-control" name="senha" placeholder="Senha">
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="col-sm-10 col-sm-offset-2">
                                 <button type="submit" class="btn btn-primary">Entrar</button>
-                                <a class="btn btn-default" href="registrar.jsp">Registrar-se</a>
+                                <!--<a class="btn btn-default" href="registrar.jsp">Registrar-se</a>-->
                             </div>
                         </div>
                     </form>
