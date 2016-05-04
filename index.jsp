@@ -1,45 +1,19 @@
-<%@ page import="livraria.*" %>
-<%@ page import="java.util.List" %>
-
+<jsp:useBean id="livraria" class="livraria.Livraria" scope="request"></jsp:useBean>
+<jsp:setProperty name="livraria" property="request" value="${pageContext.request}"></jsp:setProperty>
 <!doctype html>
 
 <html lang="pt">
 <head>
-    <%= Livraria.getHead() %>
+    <jsp:getProperty name="livraria" property="head"></jsp:getProperty>
 </head>
-<%
-    List<Livro> livros = Livro.findAll();
-%>
 <body>
-    <%= Livraria.getNavBar(request) %>
+    <jsp:getProperty name="livraria" property="navBar"></jsp:getProperty>
     <div class="container header">
         <h1>Livraria Online</h1>
     </div>
+    <jsp:getProperty name="livraria" property="errors"></jsp:getProperty>
     <div class="container loja">
-        <% for(int i = 1; i <= livros.size(); i++) { %>
-            <% Livro livro =  livros.get(i-1); %>
-            <!-- Formula 3 por linha -->
-            <% if(i % 3 == 0) {%><div class="row"><% }; %>
-                <div class="col-md-4">
-                    <div class="panel panel-default book">
-                        <div class="panel-heading"><%= livro.getTitulo() %></div>
-                        <div class="panel-body row">
-                            <div class="col-xs-6">
-                                <img alt="Imagem do livro <%= livro.getTitulo() %>"
-                                    src="<%= livro.getFoto() %>"
-                                >
-                            </div>
-                            <ul class="col-xs-6 list-group">
-                                <li class="list-group-item autor">Autor: <%= livro.getAutor() %></li>
-                                <li class="list-group-item ano">Ano: <%= livro.getAno() %></li>
-                                <li class="list-group-item editora">Editora: <%= livro.getEditora().getNome() %></li>
-                                <li class="list-group-item preco">Valor: R$ <%= String.valueOf(livro.getPreco()).replace(".", ",") %></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            <% if(i % 3 == 0) {%></div><% }; %>
-        <% } %>
+        <jsp:getProperty name="livraria" property="index"></jsp:getProperty>
     </div>
 </body>
 </html>
