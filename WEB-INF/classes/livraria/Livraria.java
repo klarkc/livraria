@@ -1,37 +1,55 @@
 package livraria;
 
-import java.lang.StringBuilder;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
 import javax.servlet.http.*;
 
 public class Livraria {
-    public static String getHead() {
-        StringBuilder head = new StringBuilder();
+    private HttpServletRequest request;
+    private HttpSession session;
+    private List<String> errors = new ArrayList<String>();;
 
-        head.append("<meta charset=\"utf-8\">");
-        head.append("<title>Livraria Online</title>");
-        head.append("<meta name=\"description\" content=\"Livraria Online\">");
-        head.append("<meta name=\"author\" content=\"Walker Gusmão Leite\">");
+    public Livraria() {}
+
+    public Livraria(HttpServletRequest request) {
+        this.request = request;
+    }
+
+    public void setRequest(HttpServletRequest request) {
+        this.request = request;
+        this.session = request.getSession();
+    }
+
+    public String getHead() {
+        HtmlBuilder head = new HtmlBuilder();
+
+        head.appendLine("<meta charset=\"utf-8\">");
+        head.appendLine("<title>Livraria Online</title>");
+        head.appendLine("<meta name=\"description\" content=\"Livraria Online\">");
+        head.appendLine("<meta name=\"author\" content=\"Walker Gusmão Leite\">");
         
         //Jquery
-        head.append("<script src=\"https://code.jquery.com/jquery-2.2.3.min.js\"></script>");
+        head.appendLine("<script src=\"https://code.jquery.com/jquery-2.2.3.min.js\"></script>");
   
         //Bootstrap Assets
-        head.append("<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css\" integrity=\"sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7\" crossorigin=\"anonymous\">");
-        head.append("<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css\" integrity=\"sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r\" crossorigin=\"anonymous\">");
-        head.append("<script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js\" integrity=\"sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS\" crossorigin=\"anonymous\"></script>");
+        head.appendLine("<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css\" integrity=\"sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7\" crossorigin=\"anonymous\">");
+        head.appendLine("<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css\" integrity=\"sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r\" crossorigin=\"anonymous\">");
+        head.appendLine("<script src=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js\" integrity=\"sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS\" crossorigin=\"anonymous\"></script>");
   
         // Custom CSS
-        head.append("<link rel=\"stylesheet\" href=\"css/styles.css?v=1.0\">");
+        head.appendLine("<link rel=\"stylesheet\" href=\"css/styles.css?v=1.0\">");
 
-        head.append("<!--[if lt IE 9]><script src=\"http://html5shiv.googlecode.com/svn/trunk/html5.js\"></script>  <![endif]-->");
+        head.appendLine("<!--[if lt IE 9]><script src=\"http://html5shiv.googlecode.com/svn/trunk/html5.js\"></script>  <![endif]-->");
 
         return head.toString();
     }
 
-    public static String getNavBar(HttpServletRequest request) {
-        StringBuilder nav = new StringBuilder();
+    public String getNavBar() {
+        HtmlBuilder nav = new HtmlBuilder();
         HttpSession session = request.getSession();
         String curUrl = request.getServletPath().substring(1);
         Map<String, String> links = new HashMap<String, String>();
@@ -45,62 +63,136 @@ public class Livraria {
             links.put("Sair", "logoff.jsp");
         }
 
-        nav.append("<nav class=\"navbar navbar-default\">");
-        nav.append("<div class=\"container\">");
+        nav.appendLine("<nav class=\"navbar navbar-default\">");
+        nav.appendLine("<div class=\"container\">");
 
-        nav.append("<div class=\"navbar-header\">");
+        nav.appendLine("<div class=\"navbar-header\">");
 
         // Brand e Botão Responsivo
-        nav.append("<button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\" data-target=\"#menu\" aria-expanded=\"false\">");
-        nav.append("<span class=\"sr-only\">Mostrar/Esconder Navegação</span>");
-        nav.append("<span class=\"icon-bar\"></span>");
-        nav.append("<span class=\"icon-bar\"></span>");
-        nav.append("<span class=\"icon-bar\"></span>");
-        nav.append("</button>");
-        nav.append("<a class=\"navbar-brand\" href=\"/livraria\">Livraria Online</a>");
+        nav.appendLine("<button type=\"button\" class=\"navbar-toggle collapsed\" data-toggle=\"collapse\" data-target=\"#menu\" aria-expanded=\"false\">");
+        nav.appendLine("<span class=\"sr-only\">Mostrar/Esconder Navegação</span>");
+        nav.appendLine("<span class=\"icon-bar\"></span>");
+        nav.appendLine("<span class=\"icon-bar\"></span>");
+        nav.appendLine("<span class=\"icon-bar\"></span>");
+        nav.appendLine("</button>");
+        nav.appendLine("<a class=\"navbar-brand\" href=\"/livraria\">Livraria Online</a>");
 
-        nav.append("</div>"); // /.navbar-header
+        nav.appendLine("</div>"); // /.navbar-header
 
         // Menu
-        nav.append("<div class=\"collapse navbar-collapse\" id=\"menu\">");
-        nav.append("<ul class=\"nav navbar-nav\">");
+        nav.appendLine("<div class=\"collapse navbar-collapse\" id=\"menu\">");
+        nav.appendLine("<ul class=\"nav navbar-nav\">");
         for (String item: links.keySet()) {
-            nav.append("<li");
+            nav.appendLine("<li");
             if(links.get(item).equals(curUrl)) {
-                nav.append(" class=\"active\"");
+                nav.appendLine(" class=\"active\"");
             }
-            nav.append("><a href=\"" + links.get(item) + "\">" + item + "</a></li>");
+            nav.appendLine("><a href=\"" + links.get(item) + "\">" + item + "</a></li>");
         }
 
-        nav.append("</ul>");
+        nav.appendLine("</ul>");
 
         // Login Form
         if(!admin) {
-            nav.append("<form class=\"navbar-form navbar-left\" action=\"login.jsp\" method=\"post\">");
-            nav.append("<div class=\"form-group\">");
-            nav.append("\n<input class=\"form-control\" type=\"text\" name=\"nome\" placeholder=\"Login\">");
-            nav.append("\n<input class=\"form-control\" type=\"password\" name=\"senha\" placeholder=\"Senha\">");
-            nav.append("</div>"); // /.form-group
-            nav.append("\n<button type=\"submit\" class=\"btn btn-default\">Login</button>");
-            nav.append("</form>");
+            nav.appendLine("<form class=\"navbar-form navbar-left\" action=\"login.jsp\" method=\"post\">");
+            nav.appendLine("<div class=\"form-group\">");
+            nav.appendLine("<input class=\"form-control\" type=\"text\" name=\"nome\" placeholder=\"Login\">");
+            nav.appendLine("<input class=\"form-control\" type=\"password\" name=\"senha\" placeholder=\"Senha\">");
+            nav.appendLine("</div>"); // /.form-group
+            nav.appendLine("<button type=\"submit\" class=\"btn btn-default\">Login</button>");
+            nav.appendLine("</form>");
         }
 
         // Busca
-        nav.append("<form class=\"navbar-form navbar-right\" action=\"busca.jsp\" method=\"post\" role=\"search\">");
-        nav.append("<div class=\"form-group\">");
-        nav.append("\n<input class=\"form-control\" type=\"text\" name=\"texto\" placeholder=\"Digite um termo\">");
-        nav.append("</div>"); // /.form-group
-        nav.append("\n<button type=\"submit\" class=\"btn btn-default\">Buscar</button>");
-        nav.append("</form>");
+        nav.appendLine("<form class=\"navbar-form navbar-right\" action=\"index.jsp\" method=\"post\" role=\"search\">");
+        nav.appendLine("<div class=\"form-group\">");
+        nav.appendLine("<input class=\"form-control\" type=\"text\" name=\"texto\" placeholder=\"Digite um termo\">");
+        nav.appendLine("</div>"); // /.form-group
+        nav.appendLine("<button type=\"submit\" class=\"btn btn-default\">Buscar</button>");
+        nav.appendLine("</form>");
 
-        nav.append("</div>"); // /.navbar-collapse
+        nav.appendLine("</div>"); // /.navbar-collapse
         
-        nav.append("</div>"); // /.container-fluid
-        nav.append("</nav>");
+        nav.appendLine("</div>"); // /.container-fluid
+        nav.appendLine("</nav>");
         
         return nav.toString();
     }
     
+    public String getIndex() {
+        HtmlBuilder index = new HtmlBuilder();
+        Iterator<Livro> livros = (new ArrayList<Livro>()).iterator();
+        int cols = 3;
+        String colClass = "col-md-4";
+
+        if(request.getMethod() == "GET") {
+            livros = Livro.findAll().iterator();
+        } else {
+            //String texto = request.getAttribute("texto");
+            //livros = Livro.search(texto);
+        }
+
+        while(livros.hasNext()) {
+            index.appendLine("<div class=\"row\">");
+            for(int i = 0; i < cols; i++) {
+                Livro livro = livros.next();
+
+                index.appendLine("<div class=\"" + colClass + "\">");
+                index.appendLine("<div class=\"panel panel-default book\">");
+
+                // Panel Head
+                index.appendLine("<div class=\"panel-heading\">");
+                index.append(livro.getTitulo());
+                index.append("</div>");
+
+                // Panel Body
+                index.appendLine("<div class=\"panel-body row\">");
+
+                index.appendLine("<div class=\"col-xs-6\">");
+                index.append("<img alt=\"Imagem do livro ");
+                index.append(livro.getTitulo());
+                index.append("\" src=\"");
+                index.append(livro.getFoto());
+                index.append("\">");
+                index.append("</div>"); // .col-xs-6
+
+                index.appendLine("<ul class=\"col-xs-6 list-group\">");
+                index.appendLine("<li class=\"list-group-item autor\">Autor: ");
+                index.append(livro.getAutor());
+                index.append("</li>");
+                index.appendLine("<li class=\"list-group-item ano\">Ano: ");
+                index.append(livro.getAno());
+                index.append("</li>");
+                index.appendLine("<li class=\"list-group-item editora\">Editora: ");
+                index.append(livro.getEditora().getNome());
+                index.append("</li>");
+                index.appendLine("<li class=\"list-group-item preco\">Valor: ");
+                index.append(String.valueOf(livro.getPreco()).replace(".", ","));
+                index.append("</li>");
+                index.appendLine("</ul>");
+
+                index.appendLine("</div>"); // .panel-body
+
+                index.appendLine("</div>"); // .panel
+                index.appendLine("</div>"); // .col-md-4
+            }
+            index.appendLine("</div>"); // .row
+        }
+
+        return index.toString();
+    }
+
+    public String getErrors() {
+        HtmlBuilder errors = new HtmlBuilder();
+        for(String error: this.errors) {
+            errors.appendLine("<div class=\"alert alert-danger\">");
+            errors.append(error);
+            errors.append("</div>");
+        }
+
+        return errors.toString();
+    }
+
     /*
     public boolean inserirLivro(Livro livro) {
         try {
