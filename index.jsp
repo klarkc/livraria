@@ -11,8 +11,8 @@
     <div class="container header">
         <h1>Livraria Online</h1>
     </div>
-    <jsp:getProperty name="livraria" property="errors"></jsp:getProperty>
     <div class="container loja">
+        <jsp:getProperty name="livraria" property="errors"></jsp:getProperty>
         <jsp:getProperty name="livraria" property="index"></jsp:getProperty>
     </div>
 </body>

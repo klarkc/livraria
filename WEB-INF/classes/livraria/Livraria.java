@@ -5,14 +5,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import javax.servlet.http.*;
 
 public class Livraria {
     private HttpServletRequest request;
+    private HttpServletResponse response;
     private HttpSession session;
     private List<String> errors = new ArrayList<String>();;
-
+    private String curUrl;
     public Livraria() {}
 
     public Livraria(HttpServletRequest request) {
@@ -22,6 +24,20 @@ public class Livraria {
     public void setRequest(HttpServletRequest request) {
         this.request = request;
         this.session = request.getSession();
+        curUrl = request.getServletPath().substring(1);
+        System.out.println("URL REQUISITADA: " + curUrl + " " + request.getMethod());
+
+        if(curUrl.equals("login.jsp") && request.getMethod().equals("POST")) {
+            this.login();
+        }
+
+        if(curUrl.equals("logoff.jsp")) {
+            this.logoff();
+        }
+    }
+
+    public void setResponse(HttpServletResponse response) {
+        this.response = response;
     }
 
     public String getHead() {
@@ -50,8 +66,6 @@ public class Livraria {
 
     public String getNavBar() {
         HtmlBuilder nav = new HtmlBuilder();
-        HttpSession session = request.getSession();
-        String curUrl = request.getServletPath().substring(1);
         Map<String, String> links = new HashMap<String, String>();
         boolean admin = (session.getAttribute("usuario") != null);
 
@@ -82,7 +96,9 @@ public class Livraria {
         // Menu
         nav.appendLine("<div class=\"collapse navbar-collapse\" id=\"menu\">");
         nav.appendLine("<ul class=\"nav navbar-nav\">");
-        for (String item: links.keySet()) {
+        List<String> itens = new ArrayList(links.keySet());
+        Collections.reverse(itens);
+        for (String item: itens) {
             nav.appendLine("<li");
             if(links.get(item).equals(curUrl)) {
                 nav.appendLine(" class=\"active\"");
@@ -193,6 +209,26 @@ public class Livraria {
         return errors.toString();
     }
 
+    public void login() {
+        Usuario usuario = new Usuario();
+        if(usuario.loadBy("nome", request.getParameter("nome"))) {
+            if(usuario.getSenha().equals(request.getParameter("senha"))) {
+                session.setAttribute("usuario", usuario);
+                System.out.println("USUÁRIO LOGADO: " + usuario.getNome());
+                redirect("index.jsp");
+            } else {
+                errors.add("Senha incorreta, por favor tente novamente");
+            }
+        } else {
+            errors.add("Usuário não encontrado, por favor tente novamente");
+        }
+    }
+
+    public void logoff() {
+        session.removeAttribute("usuario");
+        redirect("index.jsp");
+    }
+
     /*
     public boolean inserirLivro(Livro livro) {
         try {
@@ -295,4 +331,12 @@ public class Livraria {
         }
     }
     */
+
+    private void redirect(String url) {
+        try{
+            response.sendRedirect(url);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

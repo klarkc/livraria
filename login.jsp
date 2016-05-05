@@ -1,4 +1,5 @@
 <jsp:useBean id="livraria" class="livraria.Livraria"></jsp:useBean>
+<jsp:setProperty name="livraria" property="response" value="${pageContext.response}"></jsp:setProperty>
 <jsp:setProperty name="livraria" property="request" value="${pageContext.request}"></jsp:setProperty>
 <!doctype html>
 
@@ -10,13 +11,13 @@
     <div class="container header">
         <h1>Livraria Online: Login</h1>
     </div>
-    <jsp:getProperty name="livraria" property="errors"></jsp:getProperty>
     <div class="container login">
         <div class="row">
             <div class="panel panel-default">
                 <div class="panel-heading">Login da Loja</div>
                 <div class="panel-body">
-                    <form action="login" method="post" class="form-horizontal">
+                    <form action="login.jsp" method="post" class="form-horizontal">
+                        <jsp:getProperty name="livraria" property="errors"></jsp:getProperty>
                         <div class="form-group">
                             <label for="nome" class="col-sm-2 control-label">Nome</label>
                             <div class="col-sm-10">

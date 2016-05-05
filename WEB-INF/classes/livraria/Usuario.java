@@ -32,6 +32,11 @@ public class Usuario extends Model {
         return this.nome;
     }
 
+    public String getSenha()
+    {
+        return this.senha;
+    }
+
     @Override
     protected void fill(List values)
     {

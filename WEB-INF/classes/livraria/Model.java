@@ -80,7 +80,7 @@ public abstract class Model {
     public static ResultSet executeQuery(PreparedStatement ps)
     throws SQLException
     {
-        System.out.println("QUERY ENVIADA: " + ps);
+        //System.out.println("QUERY ENVIADA: " + ps);
         ResultSet rs = ps.executeQuery();
         System.out.println("QUERY EXECUTADA: " + rs.getStatement().toString());
         return rs;
