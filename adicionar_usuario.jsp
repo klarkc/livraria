@@ -11,11 +11,21 @@
 <body>
     <jsp:getProperty name="livraria" property="navBar"></jsp:getProperty>
     <div class="container header">
-        <h1>Livraria Online</h1>
+        <h1>Livraria Online: Cadastro de Usuários</h1>
     </div>
-    <div class="container loja">
+    <div class="container adicionar_usuario">
         <jsp:getProperty name="livraria" property="messages"></jsp:getProperty>
-        <jsp:getProperty name="livraria" property="index"></jsp:getProperty>
+        <form action="adicionar_usuario.jsp" method="post">
+            <div class="form-group">
+                <label for="nome">Nome do Usuário</label>
+                <input type="text" class="form-control" name="nome" placeholder="Nome do Usuário">
+            </div>
+            <div class="form-group">
+                <label for="senha">Senha</label>
+                <input type="password" class="form-control" name="senha" placeholder="Senha">
+            </div>
+            <button type="submit" class="btn btn-default">Cadastrar</button>
+        </form>
     </div>
 </body>
 </html>

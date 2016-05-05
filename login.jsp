@@ -1,3 +1,4 @@
+<%@page pageEncoding="UTF-8" %>
 <jsp:useBean id="livraria" class="livraria.Livraria"></jsp:useBean>
 <jsp:setProperty name="livraria" property="response" value="${pageContext.response}"></jsp:setProperty>
 <jsp:setProperty name="livraria" property="request" value="${pageContext.request}"></jsp:setProperty>
@@ -8,6 +9,7 @@
     <jsp:getProperty name="livraria" property="head"></jsp:getProperty>
 </head>
 <body>
+    <jsp:getProperty name="livraria" property="navBar"></jsp:getProperty>
     <div class="container header">
         <h1>Livraria Online: Login</h1>
     </div>
@@ -17,7 +19,7 @@
                 <div class="panel-heading">Login da Loja</div>
                 <div class="panel-body">
                     <form action="login.jsp" method="post" class="form-horizontal">
-                        <jsp:getProperty name="livraria" property="errors"></jsp:getProperty>
+                        <jsp:getProperty name="livraria" property="messages"></jsp:getProperty>
                         <div class="form-group">
                             <label for="nome" class="col-sm-2 control-label">Nome</label>
                             <div class="col-sm-10">

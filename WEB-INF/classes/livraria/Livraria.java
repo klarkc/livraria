@@ -13,8 +13,11 @@ public class Livraria {
     private HttpServletRequest request;
     private HttpServletResponse response;
     private HttpSession session;
-    private List<String> errors = new ArrayList<String>();;
+    private SessionMessages messages;
     private String curUrl;
+    private boolean toBeRedirected = false;
+    private boolean admin = false;
+
     public Livraria() {}
 
     public Livraria(HttpServletRequest request) {
@@ -24,6 +27,8 @@ public class Livraria {
     public void setRequest(HttpServletRequest request) {
         this.request = request;
         this.session = request.getSession();
+        this.messages = new SessionMessages(session);
+        admin = (session.getAttribute("usuario") != null);
         curUrl = request.getServletPath().substring(1);
         System.out.println("URL REQUISITADA: " + curUrl + " " + request.getMethod());
 
@@ -34,6 +39,15 @@ public class Livraria {
         if(curUrl.equals("logoff.jsp")) {
             this.logoff();
         }
+
+        if(curUrl.equals("adicionar_usuario.jsp") && !admin) {
+            messages.addError("Acesso Negado!");
+            redirect("index.jsp");
+        }
+
+        if(curUrl.equals("adicionar_usuario.jsp") && request.getMethod().equals("POST")) {
+
+        }
     }
 
     public void setResponse(HttpServletResponse response) {
@@ -43,7 +57,7 @@ public class Livraria {
     public String getHead() {
         HtmlBuilder head = new HtmlBuilder();
 
-        head.appendLine("<meta charset=\"utf-8\">");
+        head.appendLine("<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />");
         head.appendLine("<title>Livraria Online</title>");
         head.appendLine("<meta name=\"description\" content=\"Livraria Online\">");
         head.appendLine("<meta name=\"author\" content=\"Walker Gusmão Leite\">");
@@ -67,7 +81,6 @@ public class Livraria {
     public String getNavBar() {
         HtmlBuilder nav = new HtmlBuilder();
         Map<String, String> links = new HashMap<String, String>();
-        boolean admin = (session.getAttribute("usuario") != null);
 
         links.put("Home", "index.jsp");
         if(admin) {
@@ -198,15 +211,9 @@ public class Livraria {
         return index.toString();
     }
 
-    public String getErrors() {
-        HtmlBuilder errors = new HtmlBuilder();
-        for(String error: this.errors) {
-            errors.appendLine("<div class=\"alert alert-danger\">");
-            errors.append(error);
-            errors.append("</div>");
-        }
-
-        return errors.toString();
+    public String getMessages() {
+        if(toBeRedirected) return new String();
+        return messages.getAndFlush();
     }
 
     public void login() {
@@ -215,13 +222,14 @@ public class Livraria {
             if(usuario.getSenha().equals(request.getParameter("senha"))) {
                 session.setAttribute("usuario", usuario);
                 System.out.println("USUÁRIO LOGADO: " + usuario.getNome());
-                redirect("index.jsp");
             } else {
-                errors.add("Senha incorreta, por favor tente novamente");
+                messages.addError("Senha incorreta, por favor tente novamente");
             }
         } else {
-            errors.add("Usuário não encontrado, por favor tente novamente");
+            messages.addError("Usuário não encontrado, por favor tente novamente");
         }
+
+        redirect("index.jsp");
     }
 
     public void logoff() {
@@ -333,6 +341,7 @@ public class Livraria {
     */
 
     private void redirect(String url) {
+        toBeRedirected = true;
         try{
             response.sendRedirect(url);
         } catch (Exception e) {
