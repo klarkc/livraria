@@ -65,7 +65,7 @@ public class Livraria {
         if(method.equals("POST")) {
             if(curUrl.equals("adicionar_usuario.jsp")) adicionarUsuario();
             //if(curUrl.equals("adicionar_livro.jsp")) adicionarLivro();
-            //if(curUrl.equals("adicionar_editora.jsp")) adicionarEditora();
+            if(curUrl.equals("adicionar_editora.jsp")) adicionarEditora();
         }
     }
 
@@ -267,6 +267,20 @@ public class Livraria {
             redirect("index.jsp");
         } else {
             messages.addError("Erro ao salvar novo usuário");
+        }
+    }
+
+    public void adicionarEditora() {
+        Editora editora = new Editora(
+            request.getParameter("nome"),
+            request.getParameter("cidade")
+        );
+
+        if(editora.saveNew()) {
+            messages.addSuccess("Editora criada com sucesso");
+            redirect("index.jsp");
+        } else {
+            messages.addError("Erro ao salvar Editora");
         }
     }
 
