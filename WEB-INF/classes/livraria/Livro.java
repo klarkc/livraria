@@ -41,6 +41,11 @@ public class Livro extends Model {
         return this.id;
     }   
     
+    public void setId(int id)
+    {
+        this.id = id;
+    }
+
     public String getTitulo()
     {
         return this.titulo;
@@ -126,4 +131,41 @@ public class Livro extends Model {
             }
        }
     }
+
+    /*
+    public boolean excluirLivro(Livro livro) {
+        try {
+            ps = con.prepareStatement("DELETE FROM livro WHERE id = ?");
+            ps.setInt(1, livro.getId());
+            ps.executeUpdate();
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public ArrayList<Livro> listarLivros() {
+        ArrayList<Livro> livros = new ArrayList<Livro>();
+        try {
+            ps = con.prepareStatement("SELECT * FROM livro");
+            rs = ps.executeQuery();
+
+            while(rs.next()) {
+                Editora editora = new Editora(
+
+                Livro livro = new Livro(
+                    rs.getInt("id"),
+                    rs.getString("autor"),
+                    rs.getInt("ano"),
+                    rs.getDouble("preco"),
+                    rs.getString("foto")
+                    );
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    */
 }

@@ -2,8 +2,12 @@ package livraria;
 
 import java.sql.*;
 import java.util.List;
+import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+import java.lang.reflect.Method;
 
 public abstract class Model {
     protected static final Database db = new Database();
@@ -44,7 +48,99 @@ public abstract class Model {
             return false;
         }
     }
-        
+
+    /**
+    * Salva um Bean no banco de dados
+    * @param isNew se definido como true executa um INSERT no banco de dados, ao invés de um UPDATE
+    * @return true se salvo com sucesso
+    */
+    public boolean save(boolean isNew)
+    {
+        try {
+            Class<?> c = this.getClass();
+            String table = c.getSimpleName().toLowerCase();
+            StringBuilder query = new StringBuilder();
+
+            if(isNew) {
+                query.append("INSERT INTO " + table + " VALUES (");
+            } else {
+                query.append("UPDATE " + table + " SET");
+            }
+
+            Iterator<String> db_columns = getColumns(table).iterator();
+            List values = new ArrayList();
+
+            if(!isNew) db_columns.next(); // Skip id column only in UPDATE
+            int index = 0;
+            while(db_columns.hasNext()) {
+                String col = db_columns.next();
+                Method m = c.getMethod(getMethodOfColumn(col));
+                Object mValue = m.invoke(this);
+                if(mValue != null) {
+                    if(index++ > 0) query.append(",");
+                    query.append(" ");
+                    if(!isNew) {
+                        query.append(col);
+                        query.append("=");
+                    }
+                    query.append("?");
+                    values.add(mValue);
+                }
+            }
+            if(isNew) {
+                query.append(")");
+            } else {
+                query.append(" WHERE id=?");
+            }
+
+            PreparedStatement ps = db.getConnection().prepareStatement(query.toString());
+
+            if(isNew) {
+                // Generate ID Column from Bean
+                Method setId = c.getMethod("setId", int.class);
+                setId.invoke(this, generateId(table));
+                Method getId = c.getMethod("getId");
+                ps.setInt(1, (int) getId.invoke(this)); // First ?
+            } else {
+                // Set ID Column from Bean
+                Method m = c.getMethod("getId");
+                ps.setInt(values.size() +1, (int) m.invoke(this)); // Last ?, after WHERE statement
+            }
+
+            // Set column values
+            for(int i = 0; i < values.size(); i++) {
+                //System.out.println("SETTING: " + i + " to " + values.get(i));
+                ps.setObject(i+1, values.get(i));
+            }
+
+            if(executeUpdate(ps) > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+    * Salva um Bean no banco de dados
+    * @return true se salvo com sucesso
+    */
+    public boolean save() {
+        return this.save(false);
+    }
+
+    /**
+    * Salva um novo Bean no banco de dados
+    * @return true se salvo com sucesso
+    */
+    public boolean saveNew()
+    {
+        return this.save(true);
+    }
+
     public static PreparedStatement sanitizeColumns(String query, String table, List<String> fields)
     throws SQLException
     {       
@@ -58,11 +154,7 @@ public abstract class Model {
         PreparedStatement ps = db.getConnection().prepareStatement("SHOW COLUMNS FROM " + table);
         
         ResultSet rs = executeQuery(ps);
-        List<String> db_columns = new ArrayList<String>();
-        
-        while(rs.next()) {
-            db_columns.add(rs.getString("Field"));
-        }
+        List<String> db_columns = getColumns(table);
         
         fields.retainAll(db_columns); // Now fields are filtered and checked
         
@@ -84,5 +176,56 @@ public abstract class Model {
         ResultSet rs = ps.executeQuery();
         System.out.println("QUERY EXECUTADA: " + rs.getStatement().toString());
         return rs;
+    }
+
+    public static int executeUpdate(PreparedStatement ps)
+    throws SQLException
+    {
+        System.out.println("QUERY ENVIADA: " + ps);
+        int lines = ps.executeUpdate();
+        System.out.println("LINHAS AFETADAS: " + lines);
+        return lines;
+    }
+
+    public static List<String> getColumns(String table)
+    throws SQLException
+    {
+        PreparedStatement ps = db.getConnection().prepareStatement("SHOW COLUMNS FROM " + table);
+
+        ResultSet rs = executeQuery(ps);
+        List<String> db_columns = new ArrayList<String>();
+
+        while(rs.next()) {
+            db_columns.add(rs.getString("Field"));
+        }
+
+        return db_columns;
+    }
+
+    public static int generateId(String table)
+    throws SQLException
+    {
+        PreparedStatement ps = db.getConnection().prepareStatement("SELECT MAX(id) as novoid FROM " + table);
+        ResultSet rs = executeQuery(ps);
+        rs.next();
+        String novoId = rs.getString("novoid");
+        if (novoId == null) {
+            return 1;
+        } else {
+            return Integer.parseInt(novoId) + 1;
+        }
+    }
+
+    public static String getMethodOfColumn(String column)
+    {
+        String field = new String(column);
+        Pattern p = Pattern.compile("_(.)");
+        Matcher m = p.matcher("get_" + column);
+        StringBuffer sb = new StringBuffer();
+        while (m.find()) {
+            m.appendReplacement(sb, m.group(1).toUpperCase());
+        }
+        m.appendTail(sb);
+        return sb.toString();
     }
 }

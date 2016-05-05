@@ -30,23 +30,42 @@ public class Livraria {
         this.messages = new SessionMessages(session);
         admin = (session.getAttribute("usuario") != null);
         curUrl = request.getServletPath().substring(1);
+        this.route();
+    }
+
+    public void route() {
         System.out.println("URL REQUISITADA: " + curUrl + " " + request.getMethod());
+        String method = request.getMethod();
 
-        if(curUrl.equals("login.jsp") && request.getMethod().equals("POST")) {
-            this.login();
+        // Comandos para todos os usuários
+        if(curUrl.equals("logoff.jsp")) this.logoff();
+
+        if(method.equals("POST")) {
+            if(curUrl.equals("login.jsp")) this.login();
+            //if(curUrl.equals("index.jsp")) this.buscar();
         }
 
-        if(curUrl.equals("logoff.jsp")) {
-            this.logoff();
+
+        if(!admin) {
+            // Colocar abaixo as páginas com acesso público abaixo, todas as demais terão acesso negado
+            if(
+                !curUrl.equals("login.jsp")
+                && !curUrl.equals("logoff.jsp")
+                && !curUrl.equals("index.jsp")
+            ) {
+                messages.addError("Acesso Negado, efeture login!");
+                redirect("index.jsp");
+            }
+
+            // Comandos abaixo apenas para usuários não logados
+            return;
         }
 
-        if(curUrl.equals("adicionar_usuario.jsp") && !admin) {
-            messages.addError("Acesso Negado!");
-            redirect("index.jsp");
-        }
-
-        if(curUrl.equals("adicionar_usuario.jsp") && request.getMethod().equals("POST")) {
-
+        // Comandos abaixo apenas para usuários logados
+        if(method.equals("POST")) {
+            if(curUrl.equals("adicionar_usuario.jsp")) adicionarUsuario();
+            //if(curUrl.equals("adicionar_livro.jsp")) adicionarLivro();
+            //if(curUrl.equals("adicionar_editora.jsp")) adicionarEditora();
         }
     }
 
@@ -236,109 +255,20 @@ public class Livraria {
         session.removeAttribute("usuario");
         redirect("index.jsp");
     }
+    
+    public void adicionarUsuario() {
+        Usuario usuario = new Usuario(
+            request.getParameter("nome"),
+            request.getParameter("senha")
+        );
 
-    /*
-    public boolean inserirLivro(Livro livro) {
-        try {
-            int id = gerarId();
-            ps = con.prepareStatement("INSERT INTO livro VALUES (?, ?, ?, ?, ?, ?, ?)");
-            ps.setInt(1, id);
-            ps.setString(2, livro.getTitulo());
-            ps.setString(3, livro.getAutor());
-            ps.setInt(4, livro.getAno());
-            ps.setDouble(5, livro.getPreco());
-            ps.setString(6, livro.getFoto());
-            ps.setInt(7, livro.getEditora().getId());
-            ps.executeUpdate();
-            
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+        if(usuario.saveNew()) {
+            messages.addSuccess("Usuário salvo com sucesso");
+            redirect("index.jsp");
+        } else {
+            messages.addError("Erro ao salvar novo usuário");
         }
     }
-    
-    public int gerarId() {
-        String novoId;
-        try {
-            ps = con.prepareStatement("SELECT MAX(id) as novoid FROM livro");
-            rs = ps.executeQuery();
-            rs.next();
-            novoId = rs.getString("novoid");
-            if (novoId == null) {
-                return 1;
-            } else {
-                return Integer.parseInt(novoId) + 1;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return 0;
-        }
-    }
-    
-    public boolean atualizarLivro(Livro livro) {
-        try {
-            ps = con.prepareStatement(
-                "UPDATE livro " +
-                "SET titulo = ?, " +
-		    	"autor = ?, " +
-                "ano = ?, " +
-                "preco = ?, " +
-                "foto = ? " +
-                "idEditora = ? " +
-                "WHERE id = ?"
-                );
-            ps.setInt(1, livro.getId());
-            ps.setString(2, livro.getTitulo());
-            ps.setString(3, livro.getAutor());
-            ps.setInt(4, livro.getAno());
-            ps.setDouble(5, livro.getPreco());
-            ps.setString(6, livro.getFoto());
-            ps.setInt(7, livro.getEditora().getId());
-            ps.executeUpdate();
-            
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-    
-    public boolean excluirLivro(Livro livro) {
-        try {
-            ps = con.prepareStatement("DELETE FROM livro WHERE id = ?");
-            ps.setInt(1, livro.getId());
-            ps.executeUpdate();
-            
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-    
-    public ArrayList<Livro> listarLivros() {
-        ArrayList<Livro> livros = new ArrayList<Livro>();
-        try {
-            ps = con.prepareStatement("SELECT * FROM livro");
-            rs = ps.executeQuery();
-            
-            while(rs.next()) {
-                Editora editora = new Editora(
-                    
-                Livro livro = new Livro(
-                    rs.getInt("id"),
-                    rs.getString("autor"),
-                    rs.getInt("ano"),
-                    rs.getDouble("preco"),
-                    rs.getString("foto")
-                    );
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    */
 
     private void redirect(String url) {
         toBeRedirected = true;
