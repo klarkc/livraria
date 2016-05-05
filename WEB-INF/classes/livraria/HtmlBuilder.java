@@ -16,4 +16,8 @@ public class HtmlBuilder {
     public String toString() {
         return html.toString();
     }
+
+    public int length() {
+        return html.length();
+    }
 }
