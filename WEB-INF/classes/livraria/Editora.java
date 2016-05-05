@@ -1,6 +1,8 @@
 package livraria;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.sql.*;
 
 public class Editora extends Model {   
     private int id;
@@ -46,7 +48,38 @@ public class Editora extends Model {
     public List<Livro> getLivros()
     {
         return this.livros;
+    }
+
+    public static List<Editora> findAll()
+    {
+        return findAll(new ArrayList(), new ArrayList());
     }    
+
+    public static List<Editora> findAll(List<String> fields, List values)
+    {
+        try {
+            PreparedStatement ps = sanitizeColumns("SELECT * FROM editora", "editora", fields);
+
+            for(int i = 0; i < values.size(); i++) {
+                ps.setObject(i, values.get(i));
+            }
+
+            ResultSet rs = executeQuery(ps);
+            List<Editora> editoras = new ArrayList<Editora>();
+
+            while(rs.next()) {
+                editoras.add(new Editora(
+                    rs.getInt("id"),
+                    rs.getString("nome"),
+                    rs.getString("cidade")
+                ));
+            }
+            return editoras;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
     
     @Override
     protected void fill(List values)

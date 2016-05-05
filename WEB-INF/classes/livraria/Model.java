@@ -63,6 +63,10 @@ public abstract class Model {
 
             if(isNew) {
                 query.append("INSERT INTO " + table + " VALUES (");
+
+                // Generate ID Column from Bean
+                Method setId = c.getMethod("setId", int.class);
+                setId.invoke(this, generateId(table));
             } else {
                 query.append("UPDATE " + table + " SET");
             }
@@ -87,6 +91,7 @@ public abstract class Model {
                     values.add(mValue);
                 }
             }
+
             if(isNew) {
                 query.append(")");
             } else {
@@ -95,13 +100,7 @@ public abstract class Model {
 
             PreparedStatement ps = db.getConnection().prepareStatement(query.toString());
 
-            if(isNew) {
-                // Generate ID Column from Bean
-                Method setId = c.getMethod("setId", int.class);
-                setId.invoke(this, generateId(table));
-                Method getId = c.getMethod("getId");
-                ps.setInt(1, (int) getId.invoke(this)); // First ?
-            } else {
+            if(!isNew) {
                 // Set ID Column from Bean
                 Method m = c.getMethod("getId");
                 ps.setInt(values.size() +1, (int) m.invoke(this)); // Last ?, after WHERE statement
@@ -109,7 +108,7 @@ public abstract class Model {
 
             // Set column values
             for(int i = 0; i < values.size(); i++) {
-                //System.out.println("SETTING: " + i + " to " + values.get(i));
+                //System.out.println("SETTING: " + (i + 1) + " to " + values.get(i));
                 ps.setObject(i+1, values.get(i));
             }
 
@@ -209,11 +208,14 @@ public abstract class Model {
         ResultSet rs = executeQuery(ps);
         rs.next();
         String novoId = rs.getString("novoid");
+        int id;
         if (novoId == null) {
-            return 1;
+            id = 1;
         } else {
-            return Integer.parseInt(novoId) + 1;
+            id = Integer.parseInt(novoId) + 1;
         }
+        //System.out.println("GENERATED ID: " + id);
+        return id;
     }
 
     public static String getMethodOfColumn(String column)

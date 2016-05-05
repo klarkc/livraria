@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Locale;
+import java.text.NumberFormat;
 import javax.servlet.http.*;
 
 public class Livraria {
@@ -17,6 +19,7 @@ public class Livraria {
     private String curUrl;
     private boolean toBeRedirected = false;
     private boolean admin = false;
+    private Locale locale = new Locale("pt", "BR");
 
     public Livraria() {}
 
@@ -64,7 +67,7 @@ public class Livraria {
         // Comandos abaixo apenas para usuários logados
         if(method.equals("POST")) {
             if(curUrl.equals("adicionar_usuario.jsp")) adicionarUsuario();
-            //if(curUrl.equals("adicionar_livro.jsp")) adicionarLivro();
+            if(curUrl.equals("adicionar_livro.jsp")) adicionarLivro();
             if(curUrl.equals("adicionar_editora.jsp")) adicionarEditora();
         }
     }
@@ -182,7 +185,7 @@ public class Livraria {
 
         while(livros.hasNext()) {
             index.appendLine("<div class=\"row\">");
-            for(int i = 0; i < cols; i++) {
+            for(int i = 0; i < cols && livros.hasNext(); i++) {
                 Livro livro = livros.next();
 
                 index.appendLine("<div class=\"" + colClass + "\">");
@@ -235,6 +238,20 @@ public class Livraria {
         return messages.getAndFlush();
     }
 
+    public String getEditoras() {
+        HtmlBuilder options = new HtmlBuilder();
+        Iterator<Editora> editoras = Editora.findAll().iterator();
+        while(editoras.hasNext()) {
+            Editora editora = editoras.next();
+            options.appendLine("<option value=\"");
+            options.append(editora.getId());
+            options.append("\">");
+            options.append(editora.getNome());
+            options.append("</option>");
+        }
+        return options.toString();
+    }
+
     public void login() {
         Usuario usuario = new Usuario();
         if(usuario.loadBy("nome", request.getParameter("nome"))) {
@@ -281,6 +298,34 @@ public class Livraria {
             redirect("index.jsp");
         } else {
             messages.addError("Erro ao salvar Editora");
+        }
+    }
+
+    public void adicionarLivro() {
+        try{
+            NumberFormat nf = NumberFormat.getNumberInstance(locale);
+
+            int ano = Integer.parseInt(request.getParameter("ano"));
+            int editoraId = Integer.parseInt(request.getParameter("editora"));
+            double preco = nf.parse(request.getParameter("preco")).doubleValue();
+            Livro livro = new Livro(
+                request.getParameter("titulo"),
+                request.getParameter("autor"),
+                ano,
+                preco,
+                request.getParameter("foto"),
+                editoraId
+            );
+
+            if(livro.saveNew()) {
+                messages.addSuccess("Livro adicionado com sucesso");
+                redirect("index.jsp");
+            } else {
+                messages.addError("Erro ao salvar Livro");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            messages.addError("Erro de validação, por favor verifique os dados digitados");
         }
     }
 

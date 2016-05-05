@@ -12,6 +12,7 @@ public class Livro extends Model {
     private double preco;
     private String foto;
     private Editora editora;
+    private int idEditora;
     
     public Livro(){}
        
@@ -25,6 +26,16 @@ public class Livro extends Model {
         this.editora = editora;
     }
     
+    public Livro(String titulo, String autor, int ano, Double preco, String foto, int idEditora)
+    {
+        this.titulo = titulo;
+        this.autor = autor;
+        this.ano = ano;
+        this.preco = preco;
+        this.foto = foto;
+        this.idEditora = idEditora;
+    }
+
     public Livro(int id, String titulo, String autor, int ano, Double preco, String foto, Editora editora)
     {
         this.id = id;
@@ -44,6 +55,15 @@ public class Livro extends Model {
     public void setId(int id)
     {
         this.id = id;
+    }
+
+    public int getIdEditora()
+    {
+        return this.idEditora;
+    }
+
+    public void setIdEditora(int id) {
+        this.idEditora = id;
     }
 
     public String getTitulo()
@@ -143,28 +163,6 @@ public class Livro extends Model {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
-        }
-    }
-
-    public ArrayList<Livro> listarLivros() {
-        ArrayList<Livro> livros = new ArrayList<Livro>();
-        try {
-            ps = con.prepareStatement("SELECT * FROM livro");
-            rs = ps.executeQuery();
-
-            while(rs.next()) {
-                Editora editora = new Editora(
-
-                Livro livro = new Livro(
-                    rs.getInt("id"),
-                    rs.getString("autor"),
-                    rs.getInt("ano"),
-                    rs.getDouble("preco"),
-                    rs.getString("foto")
-                    );
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
         }
     }
     */
