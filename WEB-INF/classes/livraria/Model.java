@@ -142,7 +142,23 @@ public abstract class Model {
 
     public static PreparedStatement sanitizeColumns(String query, String table, List<String> fields)
     throws SQLException
-    {       
+    {
+        return sanitizeColumns(query, table, fields, "AND", "=");
+    }
+
+    public static PreparedStatement sanitizeColumns(String query, String table, List<String> fields, String multipleOp, String operator)
+    throws SQLException
+    {
+        if(
+            !multipleOp.equals("AND")
+            && !multipleOp.equals("&&")
+            && !multipleOp.equals("OR")
+            && !multipleOp.equals("||")
+            && !multipleOp.equals("XOR")
+            && !operator.equals("=")
+            && !operator.equals("LIKE")
+        ) throw new SQLException();
+
         if(fields.size() < 1) {
             return db.getConnection().prepareStatement(query);
         }
@@ -158,13 +174,38 @@ public abstract class Model {
         fields.retainAll(db_columns); // Now fields are filtered and checked
         
         for(int i = 0; i< fields.size(); i++) {
-            if (i==0) {
-                finalQuery.append(" WHERE " + fields.get(i) + " = ?");
+            // Terminar aqui
+            if(i==0) {
+                finalQuery.append(" WHERE");
+                continue;
             } else {
-                finalQuery.append(" AND " + fields.get(i) + " = ?");
+                finalQuery.append(multipleOp);
+            }
+
+            finalQuery.append(" ");
+
+            if (fields.get(i).contains("id")) {
+                if(operator.equals("LIKE")) {
+                    System.out.println("LIKE OPERATOR, SKIPING COLUMN ID: " + fields.get(i));
+                } else {
+                    finalQuery.append(fields.get(i));
+                    finalQuery.append(" = ?");
+                }
+            } else {
+                if(i!=0) {
+                    finalQuery.append(multipleOp);
+                    finalQuery.append(" ");
+                }
+
+                finalQuery.append(fields.get(i));
+                if(operator.equals("LIKE")) {
+                    finalQuery.append(" LIKE ? ");
+                } else {
+                    finalQuery.append(" = ?");
+                }
             }
         }
-        
+        System.out.println(finalQuery.toString());
         return db.getConnection().prepareStatement(finalQuery.toString());
     }
     

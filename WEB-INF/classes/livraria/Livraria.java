@@ -179,8 +179,13 @@ public class Livraria {
         if(request.getMethod() == "GET") {
             livros = Livro.findAll().iterator();
         } else {
-            //String texto = request.getAttribute("texto");
-            //livros = Livro.search(texto);
+            String texto = request.getParameter("texto");
+            livros = Livro.search(texto).iterator();
+        }
+
+        if(!livros.hasNext()) {
+            messages.addError("Não foram encontrados livros");
+            redirect("index.jsp");
         }
 
         while(livros.hasNext()) {

@@ -103,15 +103,30 @@ public class Livro extends Model {
 
     public static List<Livro> findAll(List<String> fields, List values)
     {
+        return findAll(fields, values, "AND", false);
+    }
+
+    public static List<Livro> findAll(List<String> fields, List values, String operator, boolean like)
+    {
+        List<Livro> livros = new ArrayList<Livro>();
         try {
-            PreparedStatement ps = sanitizeColumns("SELECT * FROM livro", "livro", fields);
+            PreparedStatement ps;
+            if(like) {
+                ps =  sanitizeColumns("SELECT * FROM livro", "livro", fields, operator, "LIKE");
+            } else {
+                ps =  sanitizeColumns("SELECT * FROM livro", "livro", fields, operator, "=");
+            }
         
             for(int i = 0; i < values.size(); i++) {
-                ps.setObject(i, values.get(i));
+                if(like) {
+                    ps.setString(i+1, "%" + values.get(i) + "%");
+                } else {
+                    ps.setObject(i+1, values.get(i));
+                }
+
             }        
             
-            ResultSet rs = executeQuery(ps);        
-            List<Livro> livros = new ArrayList<Livro>();
+            ResultSet rs = executeQuery(ps);
             
             while(rs.next()) {
                 Editora editora = new Editora();
@@ -131,8 +146,25 @@ public class Livro extends Model {
             return livros;
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
+            return livros;
         }
+    }
+
+
+    public static List<Livro> search(String text) {
+        List<String> db_columns = new ArrayList<String>();
+        List<String> values = new ArrayList<String>();
+        try {
+            db_columns = Livro.getColumns("livro");
+
+            // Add text value for fields that are not "id"
+            for(int i = 0; i < db_columns.size() - 2; i++) {
+                values.add(text);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return findAll(db_columns, values, "OR", true);
     }
             
     @Override
