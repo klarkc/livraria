@@ -173,30 +173,20 @@ public abstract class Model {
         
         fields.retainAll(db_columns); // Now fields are filtered and checked
         
-        for(int i = 0; i< fields.size(); i++) {
+        for(int i = 0; i < fields.size(); i++) {
             // Terminar aqui
             if(i==0) {
-                finalQuery.append(" WHERE");
-                continue;
+                finalQuery.append(" WHERE ");
             } else {
+                finalQuery.append(" ");
                 finalQuery.append(multipleOp);
+                finalQuery.append(" ");
             }
 
-            finalQuery.append(" ");
-
-            if (fields.get(i).contains("id")) {
-                if(operator.equals("LIKE")) {
-                    System.out.println("LIKE OPERATOR, SKIPING COLUMN ID: " + fields.get(i));
-                } else {
-                    finalQuery.append(fields.get(i));
-                    finalQuery.append(" = ?");
-                }
+            if (fields.get(i).contains("id")){
+                finalQuery.append(fields.get(i));
+                finalQuery.append(" = ?");
             } else {
-                if(i!=0) {
-                    finalQuery.append(multipleOp);
-                    finalQuery.append(" ");
-                }
-
                 finalQuery.append(fields.get(i));
                 if(operator.equals("LIKE")) {
                     finalQuery.append(" LIKE ? ");
@@ -205,7 +195,8 @@ public abstract class Model {
                 }
             }
         }
-        System.out.println(finalQuery.toString());
+
+        //System.out.println(finalQuery.toString());
         return db.getConnection().prepareStatement(finalQuery.toString());
     }
     

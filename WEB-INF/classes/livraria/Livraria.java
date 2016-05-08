@@ -4,6 +4,7 @@ package livraria;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -172,26 +173,42 @@ public class Livraria {
     
     public String getIndex() {
         HtmlBuilder index = new HtmlBuilder();
-        Iterator<Livro> livros = (new ArrayList<Livro>()).iterator();
+        List<Livro> livros = new ArrayList<Livro>();
+        Iterator<Livro> livrosIterator = (new ArrayList<Livro>()).iterator();
+        Iterator<Editora> editorasIterator = (new ArrayList<Editora>()).iterator();
         int cols = 3;
         String colClass = "col-md-4";
 
         if(request.getMethod() == "GET") {
-            livros = Livro.findAll().iterator();
+            livros = Livro.findAll();
         } else {
             String texto = request.getParameter("texto");
-            livros = Livro.search(texto).iterator();
+            livros = Livro.search(texto);
+            editorasIterator = Editora.search(texto).iterator();
+
+            while(editorasIterator.hasNext()) {
+                Editora tmpEditora = editorasIterator.next();
+                List<Livro> tmpLivros = Livro.findAll(
+                    Arrays.asList("idEditora"),
+                    Arrays.asList(tmpEditora.getId())
+                );
+                for(Livro tmpLivro: tmpLivros) {
+                    if(!livros.contains(tmpLivro)) livros.add(tmpLivro);
+                }
+            }
         }
 
-        if(!livros.hasNext()) {
+        livrosIterator = livros.iterator();
+
+        if(!livrosIterator.hasNext()) {
             messages.addError("Não foram encontrados livros");
             redirect("index.jsp");
         }
 
-        while(livros.hasNext()) {
+        while(livrosIterator.hasNext()) {
             index.appendLine("<div class=\"row\">");
-            for(int i = 0; i < cols && livros.hasNext(); i++) {
-                Livro livro = livros.next();
+            for(int i = 0; i < cols && livrosIterator.hasNext(); i++) {
+                Livro livro = livrosIterator.next();
 
                 index.appendLine("<div class=\"" + colClass + "\">");
                 index.appendLine("<div class=\"panel panel-default book\">");

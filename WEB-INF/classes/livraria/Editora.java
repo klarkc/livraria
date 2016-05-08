@@ -57,11 +57,26 @@ public class Editora extends Model {
 
     public static List<Editora> findAll(List<String> fields, List values)
     {
+        return findAll(fields, values, "AND", false);
+    }
+
+    public static List<Editora> findAll(List<String> fields, List values, String operator, boolean like)
+    {
         try {
-            PreparedStatement ps = sanitizeColumns("SELECT * FROM editora", "editora", fields);
+            PreparedStatement ps;
+
+            if(like) {
+                ps = sanitizeColumns("SELECT * FROM editora", "editora", fields, operator, "LIKE");
+            } else {
+                ps = sanitizeColumns("SELECT * FROM editora", "editora", fields, operator, "=");
+            }
 
             for(int i = 0; i < values.size(); i++) {
-                ps.setObject(i, values.get(i));
+                if(like) {
+                    ps.setString(i+1, "%" + values.get(i) + "%");
+                } else {
+                    ps.setObject(i+1, values.get(i));
+                }
             }
 
             ResultSet rs = executeQuery(ps);
@@ -81,6 +96,24 @@ public class Editora extends Model {
         }
     }
     
+    public static List<Editora> search(String text) {
+        List<String> db_columns = new ArrayList<String>();
+        List<String> values = new ArrayList<String>();
+        try {
+            db_columns = Editora.getColumns("editora");
+
+            // Remove ID columns
+            db_columns.remove(0);
+
+            for(int i = 0; i < db_columns.size(); i++) {
+                values.add(text);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return findAll(db_columns, values, "OR", true);
+    }
+
     @Override
     protected void fill(List values)
     {

@@ -157,8 +157,11 @@ public class Livro extends Model {
         try {
             db_columns = Livro.getColumns("livro");
 
-            // Add text value for fields that are not "id"
-            for(int i = 0; i < db_columns.size() - 2; i++) {
+            // Remove ID columns
+            db_columns.remove(0);
+            db_columns.remove(5);
+
+            for(int i = 0; i < db_columns.size(); i++) {
                 values.add(text);
             }
         } catch (SQLException e) {
@@ -182,6 +185,39 @@ public class Livro extends Model {
                 this.editora.loadBy("id", (int) values.get(i));
             }
        }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(!(o instanceof Livro))
+            return false;
+        if(o == this)
+            return true;
+
+        Livro livro = (Livro) o;
+        return (
+            id == livro.getId()
+            && livro.getTitulo().equals(titulo)
+            && livro.getAutor().equals(autor)
+            && ano == livro.getAno()
+            && preco == livro.getPreco()
+            && livro.getFoto().equals(foto)
+            && livro.getEditora().equals(editora)
+            && idEditora == livro.getIdEditora()
+        );
+    }
+
+    @Override
+    public int hashCode() {
+        return
+            id
+            + titulo.length()
+            + autor.length()
+            + ano
+            + (int) preco
+            + foto.length()
+            + editora.hashCode()
+            + idEditora;
     }
 
     /*
