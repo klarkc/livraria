@@ -36,6 +36,17 @@ public class Livro extends Model {
         this.idEditora = idEditora;
     }
 
+    public Livro(int id, String titulo, String autor, int ano, Double preco, String foto, int idEditora)
+    {
+        this.id = id;
+        this.titulo = titulo;
+        this.autor = autor;
+        this.ano = ano;
+        this.preco = preco;
+        this.foto = foto;
+        this.idEditora = idEditora;
+    }
+
     public Livro(int id, String titulo, String autor, int ano, Double preco, String foto, Editora editora)
     {
         this.id = id;

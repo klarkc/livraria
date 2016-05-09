@@ -1,7 +1,9 @@
 <%@page pageEncoding="UTF-8" %>
 <jsp:useBean id="livraria" class="livraria.Livraria" scope="request"></jsp:useBean>
+<jsp:useBean id="livro" class="livraria.Livro" scope="page"></jsp:useBean>
 <jsp:setProperty name="livraria" property="response" value="${pageContext.response}"></jsp:setProperty>
 <jsp:setProperty name="livraria" property="request" value="${pageContext.request}"></jsp:setProperty>
+
 <!doctype html>
 
 <html lang="pt">
@@ -15,14 +17,26 @@
     </div>
     <div class="container adicionar_livro">
         <jsp:getProperty name="livraria" property="messages"></jsp:getProperty>
-        <form action="adicionar_livro.jsp" method="post">
+        <form action="cadastro_livro.jsp" method="post">
+<%
+   if(request.getParameter("id") != null ) {
+        try {
+            livro.loadBy("id", Integer.parseInt(request.getParameter("id")));
+            out.println("\n<input type='hidden' value='" + livro.getId() + "' name='id'>");
+        } catch (Exception e) {
+            e.printStackTrace();
+            livraria.addError("Erro ao carregar livro");
+            livraria.redirect("index.jsp");
+        }
+   }
+%>
             <div class="form-group">
                 <label for="titulo">Título do Livro</label>
-                <input type="text" class="form-control" name="titulo" placeholder="Título do Livro">
+                <input type="text" class="form-control" name="titulo" placeholder="Título do Livro" value="${livro.titulo}">
             </div>
             <div class="form-group">
                 <label for="autor">Nome do Autor</label>
-                <input type="text" class="form-control" name="autor" placeholder="Nome do Autor">
+                <input type="text" class="form-control" name="autor" placeholder="Nome do Autor" value="${livro.autor}">
             </div>
             <div class="form-group">
                 <select class="form-control" name="editora">
@@ -31,20 +45,20 @@
             </div>
             <div class="form-group">
                 <label for="ano">Ano de Publicação</label>
-                <input type="number" class="form-control" name="ano" value="2016" min="1800" max="2020">
+                <input type="number" class="form-control" name="ano" value="2016" min="1800" max="2020" value="${livro.ano}">
             </div>
             <div class="form-group">
                 <label for="preco">Preço (em Reais)</label>
                 <div class="input-group">
                     <div class="input-group-addon">R$</div>
-                    <input type="text" class="form-control" name="preco" placeholder="Valor">
+                    <input type="text" class="form-control" name="preco" placeholder="Valor" value="${livro.preco}">
                 </div>
             </div>
             <div class="form-group">
                 <label for="foto">URL para Foto</label>
-                <input type="text" class="form-control" name="foto">
+                <input type="text" class="form-control" name="foto" value="${livro.foto}">
             </div>
-            <button type="submit" class="btn btn-default">Adicionar</button>
+            <button type="submit" class="btn btn-default">Salvar</button>
         </form>
     </div>
 </body>

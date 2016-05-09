@@ -67,8 +67,8 @@ public class Livraria {
 
         // Comandos abaixo apenas para usuários logados
         if(method.equals("POST")) {
+            if(curUrl.equals("cadastro_livro.jsp")) cadastroLivro();
             if(curUrl.equals("adicionar_usuario.jsp")) adicionarUsuario();
-            if(curUrl.equals("adicionar_livro.jsp")) adicionarLivro();
             if(curUrl.equals("adicionar_editora.jsp")) adicionarEditora();
         }
     }
@@ -107,7 +107,7 @@ public class Livraria {
 
         links.put("Home", "index.jsp");
         if(admin) {
-            links.put("Adicionar Livro", "adicionar_livro.jsp");
+            links.put("Cadastro de Livros", "cadastro_livro.jsp");
             links.put("Adicionar Editora", "adicionar_editora.jsp");
             links.put("Adicionar Usuário", "adicionar_usuario.jsp");
             links.put("Sair", "logoff.jsp");
@@ -246,6 +246,15 @@ public class Livraria {
 
                 index.appendLine("</div>"); // .panel-body
 
+                if(admin) {
+                    index.appendLine("<div class=\"panel-footer\">");
+                    index.appendLine("<a class=\"btn btn-default pull-right\" href=\"cadastro_livro.jsp?id=");
+                    index.append(livro.getId());
+                    index.append("\">Editar</a>");
+                    index.appendLine("<div class=\"clearfix\"></div>");
+                    index.appendLine("</div>");
+                }
+
                 index.appendLine("</div>"); // .panel
                 index.appendLine("</div>"); // .col-md-4
             }
@@ -322,28 +331,67 @@ public class Livraria {
             messages.addError("Erro ao salvar Editora");
         }
     }
-
-    public void adicionarLivro() {
-        try{
+    /*
+    public String getFormLivro() {
+        try {
+            HtmlBuilder form = new HtmlBuilder();
             NumberFormat nf = NumberFormat.getNumberInstance(locale);
-
             int ano = Integer.parseInt(request.getParameter("ano"));
             int editoraId = Integer.parseInt(request.getParameter("editora"));
             double preco = nf.parse(request.getParameter("preco")).doubleValue();
-            Livro livro = new Livro(
-                request.getParameter("titulo"),
-                request.getParameter("autor"),
-                ano,
-                preco,
-                request.getParameter("foto"),
-                editoraId
-            );
 
-            if(livro.saveNew()) {
-                messages.addSuccess("Livro adicionado com sucesso");
-                redirect("index.jsp");
+            form.appendLine()
+            if (request.getParameter("id") != null) {
+
+            }
+
+        } catch(Exception e) {
+            e.printStackTrace();
+            messages.addError("Erro ao carregar livro, entre em contato com o administrador");
+            redirect("index.jsp");
+            return "";
+        }
+    }
+    */
+    public void cadastroLivro() {
+        try {
+            NumberFormat nf = NumberFormat.getNumberInstance(locale);
+            int ano = Integer.parseInt(request.getParameter("ano"));
+            int editoraId = Integer.parseInt(request.getParameter("editora"));
+            double preco = nf.parse(request.getParameter("preco")).doubleValue();
+            if(request.getParameter("id")==null) {
+                Livro livro = new Livro(
+                    request.getParameter("titulo"),
+                    request.getParameter("autor"),
+                    ano,
+                    preco,
+                    request.getParameter("foto"),
+                    editoraId
+                );
+
+                if(livro.saveNew()) {
+                    messages.addSuccess("Livro adicionado com sucesso");
+                    redirect("index.jsp");
+                } else {
+                    messages.addError("Erro ao salvar Livro");
+                }
             } else {
-                messages.addError("Erro ao salvar Livro");
+                int id = Integer.parseInt(request.getParameter("id"));
+                Livro livro = new Livro(
+                    id,
+                    request.getParameter("titulo"),
+                    request.getParameter("autor"),
+                    ano,
+                    preco,
+                    request.getParameter("foto"),
+                    editoraId
+                );
+                if(livro.save()) {
+                    messages.addSuccess("Livro modificado com sucesso");
+                    redirect("index.jsp");
+                } else {
+                    messages.addError("Erro ao salvar Livro");
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -351,7 +399,15 @@ public class Livraria {
         }
     }
 
-    private void redirect(String url) {
+    public void addError(String msg) {
+        messages.addError(msg);
+    }
+
+    public void addSuccess(String msg) {
+        messages.addSuccess(msg);
+    }
+
+    public void redirect(String url) {
         toBeRedirected = true;
         try{
             response.sendRedirect(url);
