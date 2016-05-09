@@ -69,7 +69,7 @@ CREATE TABLE `livro` (
 
 LOCK TABLES `livro` WRITE;
 /*!40000 ALTER TABLE `livro` DISABLE KEYS */;
-INSERT INTO `livro` VALUES (1,'Bela Cozinha','Vela Gil',2016,25.6,'img/livro1.webp',2),(2,'Mais Rápido e Melhor','Charles Duhigg',2016,29.9,'img/livro2.webp',1),(3,'Deadpool','Marvel',2016,15.49,'img/livro3.webp',3),(4,'Manual de Direito Civil','Flávio Tartuce',2015,120,'img/livro4.webp',2),(5,'Before','Anna Todd',2016,39.9,'img/livro5.webp',2),(6,'Mulher Maravilha','DC Comics',2015,14.9,'img/livro6.webp',4);
+INSERT INTO `livro` VALUES (1,'Bela Cozinha','Vela Gil',2016,25.6,'img/livro1.webp',2),(2,'Mais Rapido e Melhor','Charles D.',2016,29900,'img/livro2.webp',1),(3,'Deadpool','Marvel',2016,1549,'img/livro3.webp',3),(4,'Manual de Direito Civil','Flávio Tartuce',2015,120,'img/livro4.webp',2),(5,'Before','Anna Todd',2016,39.9,'img/livro5.webp',2),(6,'Mulher Maravilha','DC Comics',2015,14.9,'img/livro6.webp',4),(7,'Teste','Teste',2016,1240,'img/livro1.webp',1);
 /*!40000 ALTER TABLE `livro` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -133,4 +133,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-05-09 11:55:14
+-- Dump completed on 2016-05-09 13:16:20
